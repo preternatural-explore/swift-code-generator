@@ -156,7 +156,7 @@ struct ContentView: View {
         return try? await highlight.attributedText(
             code,
             language: .swift,
-            colors: .light(.stackoverflow)
+            colors: .dark(.stackoverflow)
         )
     }
 }
