@@ -12,7 +12,6 @@ The Swift Code Generator is a demo app that allows users to input natural langua
 - [Key Concepts](#key-concepts)
 - [Preternatural Frameworks](#preternatural-frameworks)
 - [Technical Specifications](#technical-specifications)
-- [FAQ](#faq)
 - [Acknowledgements](#acknowledgements)
 - [License](#license)
 
@@ -58,10 +57,7 @@ You can get the Anthropic key on the [Anthropic developer website](https://docs.
 <img width="426" alt="smartcode" src="https://github.com/user-attachments/assets/b00443cf-eaa1-4e31-924f-20b4805ca4cb">
 
 ## Key Concepts
-The [ProjectName] app is developed to demonstrate the the following key concepts:
-
-- How to orem ipsum dolor sit amet
-- How to orem ipsum dolor sit amet
+The Swift Code Generator app is developed to demonstrate how to work with Anthropic's LLM completions API to include the start and end of the desired result output. 
 
 ## Preternatural Frameworks
 The following Preternatural Frameworks were used in this project: 
