@@ -64,7 +64,95 @@ The following Preternatural Frameworks were used in this project:
 - [AI](https://github.com/PreternaturalAI/AI): The definitive, open-source Swift framework for interfacing with generative AI.
 
 ## Technical Specifications
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Large Language Models (LLMs) in their current form are notorious for being too verbose… For example, when Claude is asked a direct question - such as “Who was the first US president”, we get this full response instead of the simple “George Washington” answer as expected. 
+
+<img width="799" alt="Screenshot 2024-08-24 at 11 50 43 AM" src="https://github.com/user-attachments/assets/8247d4b0-b10d-475c-aa76-e33b4c6d28d4">
+
+This presents a problem for us as developers. We might want to use an LLM for direct responses such as “George Washington” but instead have to work around these big long verbose responses. The Swift Code Generator is a demonstration using one strategy for generating Swift code in response to a user request.  
+
+As seen in the screenshot - the goal is to generating ONLY SWIFT CODE and none of the verbosity around it that is usually present in Claude as seen in this response for the same query: 
+
+<img width="1425" alt="Screenshot 2024-08-24 at 11 56 59 AM" src="https://github.com/user-attachments/assets/6aebea34-223b-4bf4-a6d3-926a82bc2173">
+
+
+So how do we approach this? 
+
+The first step is to write the system and user prompt with the basic instructions. You can check the `LLMManager` file for the full implementation: 
+
+```swift
+// LLMManager.swift
+
+let systemPrompt: PromptLiteral = """
+You are a Swift code generation AI. Your sole purpose is to produce Swift code in response to user requests. Adhere to these guidelines:
+1. Generate only Swift code.
+2. Ensure the code is complete, correct, and follows Swift best practices.
+3. Include necessary import statements.
+4. Use the latest Swift syntax and idioms.
+5. Optimize for clarity and efficiency.
+"""
+
+let userPrompt: PromptLiteral = """
+Generate Swift code for the following task:
+
+\(userInput)
+"""
+```
+
+Although not explicitly seen in this specific Claude answer, the LLM is trained on many Markdown files. So we can image that it will easily know Markdown syntax for swift code as: 
+
+<pre>
+```swift
+SWIFT CODE
+```
+</pre>
+
+Some LLMs, including Claude, allow to provide the start of the assistant reply. In this case, we can prompt Claude to start the response to our user prompt with the markdown: 
+
+```
+let assistantStart: PromptLiteral = """
+```swift
+"""
+
+let messages: [AbstractLLM.ChatMessage] = [
+    .system(systemPrompt),
+    .user(userPrompt),
+    .assistant(assistantStart)
+]
+```
+
+Now, instead of answering the user query with something like “Certainly, I can help you create a purple button in Swift. Here's a simple implementation using SwiftUI:”, it will directly start by completing the markdown, which forces Claude to write Swift code right away.
+
+However, Claude can still keep writing explanations of the code after it finishes the Swift code. In this case, we can use a “stop sequence” “```” to tell Claude when to STOP generating anything further: 
+
+```swift
+let parameters = AbstractLLM.ChatCompletionParameters(
+        tokenLimit: nil,
+        temperature: nil,
+        stops: ["```"], // the stop sequence is the end of the markdown "```"
+        functions: nil)
+```
+
+Now Claude is forced to start its Assistant Reply with “```swift” and end generating anything after “```” - this ensures that only Swift code is generated an no verbosity around it! Note that the stop sequence itself is NOT included in the Claude reply - it is automatically stripped out. So the final response will only be: 
+
+<pre>
+```swift
+SWIFT CODE
+</pre>
+
+We therefore still do have to remove the “```swift” part of the code: 
+
+```swift
+let code: String = try await client.complete(
+    messages,
+    parameters: parameters,
+    model: model,
+    as: .string)
+
+let trimmedCode = code.trimmingCharacters(in: .whitespacesAndNewlines)
+let processedCode = trimmedCode.replacingOccurrences(of: "```swift\n", with: "")
+```
+
+We can now successfully process the Swift code string as an Attributed String and display it in our app. The same technique can be used for other use-cases where the start and end point of the desired generated LLM response is known.
 
 ## Acknowledgements
 
