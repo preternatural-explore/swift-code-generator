@@ -64,7 +64,7 @@ The following Preternatural Frameworks were used in this project:
 - [AI](https://github.com/PreternaturalAI/AI): The definitive, open-source Swift framework for interfacing with generative AI.
 
 ## Technical Specifications
-Large Language Models (LLMs) in their current form are notorious for being too verbose… For example, when Claude is asked a direct question - such as “Who was the first US president”, we get this full response instead of the simple “George Washington” answer as expected. 
+Large Language Models (LLMs) in their current form are notorious for being too verbose… For example, when Claude is asked a direct question - such as “Who was the first US president”, it gives this full response instead of the simple “George Washington” answer as expected. 
 
 <img width="799" alt="Screenshot 2024-08-24 at 11 50 43 AM" src="https://github.com/user-attachments/assets/8247d4b0-b10d-475c-aa76-e33b4c6d28d4">
 
@@ -108,7 +108,7 @@ SWIFT CODE
 
 Some LLMs, including Claude, allow to provide the start of the assistant reply. In this case, we can prompt Claude to start the response to our user prompt with the markdown: 
 
-```
+```swift
 let assistantStart: PromptLiteral = """
 ```swift
 """
